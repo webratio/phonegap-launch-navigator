@@ -53,11 +53,17 @@ function onDiscoverSupportedApps(supportedApps){
         common.APPS_BY_PLATFORM[common.PLATFORM.ANDROID].push(packageName);
         common.SUPPORTS_DEST_NAME[common.PLATFORM.ANDROID].push(packageName);
     }
+    if (onDiscoverSupportedAppsCallback){
+    	onDiscoverSupportedAppsCallback();
+    }
 }
 
 function onDiscoverSupportedAppsError(error){
     console.error("Error discovering list of supported apps: "+error);
 }
+
+// Flag to determine whether to discover the installed navigation apps. 
+var discoverApps = true;
 
 /**
  * Returns a list indicating which apps are installed and available on the current device.
@@ -65,11 +71,40 @@ function onDiscoverSupportedAppsError(error){
  * @param {function} error - callback to invoke on error while determining availability. Will be passed a single string argument containing the error message.
  */
 ln.availableApps = function(success, error){
+	if (discoverApps){
+		ln.discoverSupportedApps(function(){
+			discoverApps = false;
+			cordova.exec(
+		        success,
+		        error,
+		        'LaunchNavigator',
+		        'availableApps',
+		        []
+		    );
+		});
+	} else {
+	    cordova.exec(
+	        success,
+	        error,
+	        'LaunchNavigator',
+	        'availableApps',
+	        []
+	    );
+	}
+};
+
+/**
+ * Populates the list indicating which apps are installed and available on the current device.
+ * @param {function} success - callback to invoke on successful population. Nothing will be passed back
+ * @param {function} error - callback to invoke on error while populating. Nothing will be passed back
+ */
+ln.discoverSupportedApps = function(success, error){
+	onDiscoverSupportedAppsCallback = success;
     cordova.exec(
-        success,
-        error,
+        onDiscoverSupportedApps,
+        onDiscoverSupportedAppsError,
         'LaunchNavigator',
-        'availableApps',
+        'discoverSupportedApps',
         []
     );
 };
@@ -315,12 +350,18 @@ common._supportsDestName = common.supportsDestName;
  ************/
 
 // Discover supported apps
-cordova.exec(
-    onDiscoverSupportedApps,
-    onDiscoverSupportedAppsError,
-    'LaunchNavigator',
-    'discoverSupportedApps',
-    []
-);
+
+// Fix for #12847 - sometimes the plugin bootstraps before Ripple has completed to prepare its data structures
+// and this leads to the error "Missing plugin emulation support".
+// The solution is to perform the discovery in a lazy way, just before the very first request of navigation
+// directions.
+
+//cordova.exec(
+//    onDiscoverSupportedApps,
+//    onDiscoverSupportedAppsError,
+//    'LaunchNavigator',
+//    'discoverSupportedApps',
+//    []
+//);
 
 module.exports = ln;
