@@ -1,18 +1,18 @@
 function createStubs() {
 
     var $ = window.top.jQuery;
-    var mapInit = null;
+    var mapNavInit = null;
     var google = null;
     var map = null;
-    var mapView = null;
+    //var mapView = null;
     var directionsMapView = null;
-    directionsService = null;
-    directionsDisplay = null;
-    directionsMap = null;
-    var markers = [];
-    var markersId = [];
-    var infoWindows = [];
-    var lastBound = null;
+    var directionsService = null;
+    var directionsDisplay = null;
+    var directionsMap = null;
+    //var markers = [];
+    //var markersId = [];
+    //var infoWindows = [];
+    //var lastBound = null;
 
     function initOpenMapForDirections(params) {
     
@@ -38,29 +38,29 @@ function createStubs() {
     }
 
 	function log() {
-        var args = [].slice.call(arguments, 0);
-        args.unshift("[Launch Navigator]");
-        console.log.apply(console, args);
+        //var args = [].slice.call(arguments, 0);
+        //args.unshift("[Launch Navigator]");
+        //console.log.apply(console, args);
     }
     
     function initializeMaps(){
-	    window.top["gmapinitialize"] = function() {
-	        mapInit["mapinitialized"] = true;
-	        mapInit["resolve"]();
+	    window.top["gmapnavinitialize"] = function() {
+			mapNavInit["mapnavinitialized"] = true;
+			mapNavInit["mapnavresolve"]();
 	        google = window.top.google;
 	    };
 	
-	    mapInit = {
-	        mapinitialized: false
+		mapNavInit = {
+	        mapnavinitialized: false
 	    };
 
-	    mapInit["mappromise"] = new Promise(function(resolve) {
-	        mapInit["resolve"] = resolve;
+		mapNavInit["mapnavpromise"] = new Promise(function(resolve) {
+			mapNavInit["mapnavresolve"] = resolve;
 	    });
 	    
     	var script = document.createElement('script');
         script.type = 'text/javascript';
-        script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp' + '&callback=gmapinitialize';
+        script.src = 'https://maps.googleapis.com/maps/api/js?v=3' + '&callback=gmapnavinitialize';
         $('body').append(script);
     }
     
@@ -90,8 +90,12 @@ function createStubs() {
 	                    directionsMapView = initOpenMapForDirections();
 	                    directionsService = new google.maps.DirectionsService();
 	                    directionsDisplay = new google.maps.DirectionsRenderer();
-	                    directionsMap = new google.maps.Map(directionsMapView[0]);
-	                    directionsDisplay.setMap(directionsMap);
+						var mapOptions = {
+							zoom: 10,
+							center: new google.maps.LatLng(45.4382891,9.1691302),
+							mapTypeId: google.maps.MapTypeId.ROADMAP
+						};
+	                    directionsMap = new google.maps.Map(directionsMapView[0], mapOptions);
 	                } else {
 	                    wrapBackButton();
 	                }
@@ -104,8 +108,13 @@ function createStubs() {
 	
 	                directionsService.route(request, function(response, status) {
 	                    if (status == google.maps.DirectionsStatus.OK) {
+							directionsDisplay.setMap(directionsMap);
 	                        directionsDisplay.setDirections(response);
-	                    }
+	                    } else {
+							directionsMap.setZoom(10);
+							directionsMap.setCenter(new google.maps.LatLng(45.4382891,9.1691302));
+							directionsDisplay.setMap(null);
+						}
 	                });
 	
 	                /* User clicks 'back' button */
