@@ -60,7 +60,7 @@ function createStubs() {
 	    
     	var script = document.createElement('script');
         script.type = 'text/javascript';
-        script.src = 'https://maps.googleapis.com/maps/api/js?v=3' + '&callback=gmapnavinitialize';
+        script.src = 'https://maps.googleapis.com/maps/api/js?v=3.31' + '&callback=gmapnavinitialize';
         $('body').append(script);
     }
     
