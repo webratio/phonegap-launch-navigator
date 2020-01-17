@@ -3,14 +3,16 @@
     xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="uk.co.workingedge.phonegap.plugin.launchnavigator"
-    version="4.1.3.3wr">
+    version="5.0.4-dev.1wr">
 
   <name>Launch Navigator</name>
-  <description>Cordova/Phonegap plugin to navigate to a destination using native navigation apps on Android, iOS, and Windows Phone</description>
+  <description>Cordova/Phonegap plugin to navigate to a destination using native navigation apps on Android, iOS, and Windows</description>
   <author>Dave Alden</author>
 
   <engines>
-    <engine name="cordova" version=">=4.0.0" />
+    <engine name="cordova" version=">=7.1.0"/>
+    <engine name="cordova-android" version=">=6.3.0"/>
+    <engine name="cordova-ios" version=">=4.3.0"/>
   </engines>
   <repo>https://github.com/dpa99c/phonegap-launch-navigator.git</repo>
   <issue>https://github.com/dpa99c/phonegap-launch-navigator/issues</issue>
@@ -28,6 +30,13 @@
 
   <!-- android -->
   <platform name="android">
+    <preference name="GOOGLE_API_KEY_FOR_ANDROID" />
+    <config-file target="AndroidManifest.xml" parent="/manifest/application">
+      <meta-data
+              android:name="launchnavigator.GOOGLE_API_KEY"
+              android:value="$GOOGLE_API_KEY_FOR_ANDROID" />
+    </config-file>
+
     <dependency id="cordova-plugin-actionsheet" version="2" />
     <dependency id="cordova-plugin-dialogs" version="*" />
 
@@ -37,17 +46,24 @@
 
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="LaunchNavigator">
-        <param name="android-package" value="uk.co.workingedge.phonegap.plugin.LaunchNavigator"/>
+        <param name="android-package" value="uk.co.workingedge.phonegap.plugin.LaunchNavigatorPlugin"/>
       </feature>
     </config-file>
 
-    <source-file src="src/android/LaunchNavigator.java" target-dir="src/uk/co/workingedge/phonegap/plugin" />
+    <!-- Cordova wrapper -->
+    <source-file src="src/android/LaunchNavigatorPlugin.java" target-dir="src/uk/co/workingedge/phonegap/plugin" />
+    <source-file src="src/android/CordovaLogger.java" target-dir="src/uk/co/workingedge/phonegap/plugin" />
+
+    <!-- LaunchNavigator lib -->
+    <source-file src="src/android/lib/LaunchNavigator.java" target-dir="src/uk/co/workingedge" />
+    <source-file src="src/android/lib/ILogger.java" target-dir="src/uk/co/workingedge" />
 
     <config-file target="AndroidManifest.xml" parent="/*">
       <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     </config-file>
 
-    <framework src="com.squareup.okhttp3:okhttp:3+" />
+    <preference name="OKHTTP_VERSION" default="3.12.0" />
+    <framework src="com.squareup.okhttp3:okhttp:$OKHTTP_VERSION" />
   </platform>
 
   <!-- ios -->
@@ -61,14 +77,23 @@
 
     <config-file target="config.xml" parent="/*">
       <feature name="LaunchNavigator">
-        <param name="ios-package" value="LaunchNavigator"/>
+        <param name="ios-package" value="LaunchNavigatorPlugin"/>
       </feature>
     </config-file>
+    
+    <!-- Cordova wrapper -->
+    <header-file src="src/ios/LaunchNavigatorPlugin.h" />
+    <source-file src="src/ios/LaunchNavigatorPlugin.m" />
+    <header-file src="src/ios/WE_CordovaLogger.h" />
+    <source-file src="src/ios/WE_CordovaLogger.m" />
 
-    <header-file src="src/ios/LaunchNavigator.h" />
-    <source-file src="src/ios/LaunchNavigator.m" />
-    <header-file src="src/ios/LN_Reachability.h" />
-    <source-file src="src/ios/LN_Reachability.m" />
+    <!-- LaunchNavigator lib -->
+    <header-file src="src/ios/lib/LN_LaunchNavigator.h" />
+    <source-file src="src/ios/lib/LN_LaunchNavigator.m" />
+    <header-file src="src/ios/lib/LN_Reachability.h" />
+    <source-file src="src/ios/lib/LN_Reachability.m" />
+    <header-file src="src/ios/lib/WE_Logger.h" />
+    <source-file src="src/ios/lib/WE_Logger.m" />
 
     <framework src="MapKit.framework" />
     <framework src="CoreLocation.framework" />
@@ -91,6 +116,8 @@
         <string>mapsme</string>
         <string>cabify</string>
         <string>baidumap</string>
+        <string>taxis99</string>
+        <string>iosamap</string>
       </array>
     </config-file>
 
@@ -104,13 +131,6 @@
   <!-- windows -->
   <platform name="windows">
     <js-module src="www/windows/launchnavigator.js" name="LaunchNavigator">
-      <merges target="launchnavigator" />
-    </js-module>     
-  </platform>
-
-  <!-- wp8 -->
-  <platform name="wp8">
-    <js-module src="www/wp8/launchnavigator.js" name="LaunchNavigator">
       <merges target="launchnavigator" />
     </js-module>     
   </platform>

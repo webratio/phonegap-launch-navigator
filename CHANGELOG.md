@@ -1,5 +1,45 @@
 # CHANGELOG
 
+## 5.0.4
+- Fix checks for empty strings/objects on iOS. Resolves [#216](https://github.com/dpa99c/phonegap-launch-navigator/issues/216).
+- Make LNEmptyCoord static to scope it to the class. Prevents build failures with `cordova-ios@5`. Fixes [#217](https://github.com/dpa99c/phonegap-launch-navigator/issues/217).
+
+## 5.0.3
+- Pass `navigate=yes` to Waze on Android if input type is an address. Resolves [#213](https://github.com/dpa99c/phonegap-launch-navigator/issues/213).
+- Pass the now required FLAG_ACTIVITY_NEW_TASK intent flag on Android. Fixes [#215](https://github.com/dpa99c/phonegap-launch-navigator/issues/215).
+
+## 5.0.2
+- Pin default OKHTTP version to 3.12.0 since 3.13.0 contains JDK 1.8 bytecode with which cordova-android@7.1.4 (and below) is incompatible so it causes build failure.
+
+## 5.0.1
+- Fix check for empty extras parameter on iOS. Fixes [#212](https://github.com/dpa99c/phonegap-launch-navigator/issues/212).
+
+## 5.0.0
+- Major rework of native code to separate Cordova plugin layer from native launch navigator functionality.
+- Remove obsolete Windows Phone 8 platform.
+- Add explicit `enableDebug()` API function to enable debug output.
+- Add plugin variable to enable specification of Google API key for geocoding on Android. Fixes [#211](https://github.com/dpa99c/phonegap-launch-navigator/issues/211).
+
+## v4.2.2
+- Add minimum version restriction on Cordova CLI and platforms to prevent anomalous issues being reported due to outdated Cordova environment.
+
+## v4.2.1
+- Enable override of default OKHTTP version to prevent Gradle version collisions. Fixes [#193](https://github.com/dpa99c/phonegap-launch-navigator/issues/193).
+
+## v4.2.0
+- Make iOS call success/error callbacks wait for and return the result of calling openURL(), rather than just assuming success immediately.
+- Add Gaode (Amap) support for Android and iOS. Resolves [#185](https://github.com/dpa99c/phonegap-launch-navigator/issues/185).
+- Fix launching of Citymapper (both Android & iOS) by geocoding address input since native address input is no longer working in recent versions of Citymapper. Fixes [#180](https://github.com/dpa99c/phonegap-launch-navigator/issues/180). 
+- Fix Cabify iOS URL Scheme. See [#155](https://github.com/dpa99c/phonegap-launch-navigator/issues/155).
+- Replace deprecated iOS function `stringByAddingPercentEscapesUsingEncoding` with `stringByAddingPercentEncodingWithAllowedCharacters`.
+- Add 99 Taxi support for Android and iOS. Resolves [#183](https://github.com/dpa99c/phonegap-launch-navigator/issues/183).
+
+## v4.1.5
+- Detect and handle disabled Android apps (i.e. Google Maps). Resolves [#182](https://github.com/dpa99c/phonegap-launch-navigator/issues/182).
+
+## v4.1.4
+- Add missing app name native iOS constants for Cabify and Baidu.
+
 ## v4.1.3
 - Declare Objective-C constants as static. See [cordova-diagnostic-plugin#270](https://github.com/dpa99c/cordova-diagnostic-plugin/issues/270).
 

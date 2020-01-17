@@ -1,9 +1,19 @@
 Launch Navigator Cordova/Phonegap Plugin [![Latest Stable Version](https://img.shields.io/npm/v/uk.co.workingedge.phonegap.plugin.launchnavigator.svg)](https://www.npmjs.com/package/uk.co.workingedge.phonegap.plugin.launchnavigator) [![Total Downloads](https://img.shields.io/npm/dt/uk.co.workingedge.phonegap.plugin.launchnavigator.svg)](https://npm-stat.com/charts.html?package=uk.co.workingedge.phonegap.plugin.launchnavigator)
 =================================
 
-This Cordova/Phonegap plugin can be used to navigate to a destination by launching native navigation apps on Android, iOS and Windows.
+Cordova/Phonegap plugin for launching today's most popular navigation/ride apps to navigate to a destination.
 
-The plugin is registered on [npm](https://www.npmjs.com/package/uk.co.workingedge.phonegap.plugin.launchnavigator) as `uk.co.workingedge.phonegap.plugin.launchnavigator`
+Platforms: Android, iOS and Windows.
+
+Key features:
+
+- Single, clean API to abstract away the gory details of each 3rd party app's custom URI scheme
+- Detects which supported apps are installed/available on the user's device
+- API to detect which features are supported by which apps on which platforms
+- Out-of-the-box UI for app selection which remembers user choice
+- Growing list of [supported apps](#supported-navigation-apps)
+
+Launch Navigator is also available as a [React Native module](https://github.com/dpa99c/react-native-launch-navigator).
 
 <p align="center">
   <img src="http://i.imgur.com/v96FhpZ.gif" />
@@ -31,6 +41,8 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
 - [Installing](#installing)
   - [Using the CLI](#using-the-cli)
   - [PhoneGap Build](#phonegap-build)
+  - [Google API key for Android](#google-api-key-for-android)
+  - [OKHTTP Library](#okhttp-library)
 - [Usage examples](#usage-examples)
   - [Simple usage](#simple-usage)
     - [Navigate to a destination address from current location.](#navigate-to-a-destination-address-from-current-location)
@@ -51,6 +63,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [LAUNCH_MODE](#launch_mode)
   - [API methods](#api-methods)
     - [navigate()](#navigate)
+    - [enableDebug()](#enabledebug)
     - [isAppAvailable()](#isappavailable)
     - [availableApps()](#availableapps)
     - [getAppDisplayName()](#getappdisplayname)
@@ -77,6 +90,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
     - [Apple Maps launch method](#apple-maps-launch-method)
 - [App-specifics](#app-specifics)
   - [Lyft](#lyft)
+  - [99 Taxi](#99-taxi)
 - [Reporting issues](#reporting-issues)
 - [Credits](#credits)
 - [License](#license)
@@ -103,6 +117,7 @@ To help ensure this plugin is kept updated, new features are added and bugfixes 
   - geocoding is disabled by passing `enableGeocoding: false` in the options object
   - there is no internet connection to perform the remote geocode operation
   - geocoding fails (e.g. an address cannot be found for the given lat/long coords)
+- Note that for geocoding to work on Android, a Google API key must be specified in order to use the Google Geocoder API service (see installation instructions below).
   
 ## Remember user's choice of navigation app
 
@@ -128,7 +143,11 @@ Android
 * [Lyft](https://play.google.com/store/apps/details?id=me.lyft.android)
 * [MAPS.ME](https://play.google.com/store/apps/details?id=com.mapswithme.maps.pro)
 * [Cabify](https://play.google.com/store/apps/details?id=com.cabify.rider)
+* [99 Taxi](https://play.google.com/store/apps/details?id=com.taxis99&hl=en)
 * [Baidu Maps](https://play.google.com/store/apps/details?id=com.baidu.BaiduMap)
+* [Gaode](https://play.google.com/store/apps/details?id=com.autonavi.minimap&hl=en)
+
+
 * _Any installed app that supports the [`geo:` URI scheme](http://developer.android.com/guide/components/intents-common.html#Maps)_
 
 iOS
@@ -148,7 +167,10 @@ iOS
 * [Lyft](https://itunes.apple.com/us/app/lyft/id529379082?mt=8)
 * [MAPS.ME](https://itunes.apple.com/us/app/maps-me-offline-map-with-navigation-directions/id510623322?mt=8)
 * [Cabify](https://itunes.apple.com/us/app/cabify-enjoy-the-ride/id476087442?mt=8)
+* [99 Taxi](https://itunes.apple.com/gb/app/99-taxi-and-private-drivers/id553663691?mt=8)
 * [Baidu Maps](https://itunes.apple.com/us/app/%E7%99%BE%E5%BA%A6%E5%9C%B0%E5%9B%BE-%E5%85%AC%E4%BA%A4%E5%9C%B0%E9%93%81%E5%87%BA%E8%A1%8C%E5%BF%85%E5%A4%87%E7%9A%84%E6%99%BA%E8%83%BD%E5%AF%BC%E8%88%AA/id452186370?mt=8)
+* [Gaode](https://itunes.apple.com/cn/app/%E9%AB%98%E5%BE%B7%E5%9C%B0%E5%9B%BE-%E7%B2%BE%E5%87%86%E5%9C%B0%E5%9B%BE-%E5%AF%BC%E8%88%AA%E5%BF%85%E5%A4%87/id461703208?mt=8)
+
 
 Windows
 
@@ -161,10 +183,12 @@ This plugin is a work in progress. I'd like it to support launching of as many p
 If there's another navigation app which you think should be explicitly supported and **it provides a mechanism to externally launch it**,
 open an issue containing a link or details of how the app should be invoked.
 
-**Don't** just open an issue saying "Add support for Blah" without first find out if/how it can be externally launched.
+**Don't** just open an issue saying "Add support for Blah" without first finding out if/how it can be externally launched.
 I don't have time to research launch mechanisms for every suggested app, so I will close such issues immediately.
 
 # Installing
+
+The plugin is registered on [npm](https://www.npmjs.com/package/uk.co.workingedge.phonegap.plugin.launchnavigator) as `uk.co.workingedge.phonegap.plugin.launchnavigator`
 
 **IMPORTANT:** Note that the plugin will **NOT** work in a browser-emulated Cordova environment, for example by running `cordova serve` or using the [Ripple emulator](https://github.com/ripple-emulator/ripple).
 This plugin is intended to launch **native** navigation apps and therefore will only work on native mobile platforms (i.e. Android/iOS/Windows).
@@ -172,15 +196,30 @@ This plugin is intended to launch **native** navigation apps and therefore will 
 
 ## Using the CLI
 
-    $ cordova plugin add uk.co.workingedge.phonegap.plugin.launchnavigator
-    $ phonegap plugin add uk.co.workingedge.phonegap.plugin.launchnavigator
-    $ ionic cordova plugin add uk.co.workingedge.phonegap.plugin.launchnavigator
+    $ cordova plugin add uk.co.workingedge.phonegap.plugin.launchnavigator --variable GOOGLE_API_KEY_FOR_ANDROID="{your_api_key}"
+    $ phonegap plugin add uk.co.workingedge.phonegap.plugin.launchnavigator --variable GOOGLE_API_KEY_FOR_ANDROID="{your_api_key}"
+    $ ionic cordova plugin add uk.co.workingedge.phonegap.plugin.launchnavigator --variable GOOGLE_API_KEY_FOR_ANDROID="{your_api_key}"
 
 ## PhoneGap Build
 
 Add the following xml to your config.xml to use the latest version of this plugin from [npm](https://www.npmjs.com/package/uk.co.workingedge.phonegap.plugin.launchnavigator):
 
-    <plugin name="uk.co.workingedge.phonegap.plugin.launchnavigator" source="npm" />
+    <plugin name="uk.co.workingedge.phonegap.plugin.launchnavigator" source="npm" >
+        <variable name="GOOGLE_API_KEY_FOR_ANDROID" value="{your_api_key}" />
+    </plugin>
+
+## Google API key for Android
+- On Android, this plugin uses [Google's Geocoding API](https://developers.google.com/maps/documentation/geocoding/intro) to geocode input addresses to lat/lon coordinates in order to support navigation apps which only allow input locations to be specified as lat/lon coordinates.
+- Google now requires that an API key be specified in order to use the Geocoding API, so you'll need to obtain an API key and specify it via the `GOOGLE_API_KEY_FOR_ANDROID` plugin variable during plugin installation.
+- For more information on how to obtain an API key, see the [Google documentation](https://developers.google.com/maps/documentation/geocoding/get-api-key).
+
+## OKHTTP Library
+- This plugin uses the [OKHTTP library](https://square.github.io/okhttp/) on Android to access Google's remote Geocoding API service
+- The library is included at Android build time via Gradle
+- If another plugin in your Cordova project specifies a different version of the OKHTTP library than this plugin, this can cause a Gradle version collision leading to build failure. [See #193](https://github.com/dpa99c/phonegap-launch-navigator/issues/193).
+- You can override the default version of the library specified by this plugin by specifying the `OKHTTP_VERSION` plugin variable during plugin installation:
+    - `cordova plugin add uk.co.workingedge.phonegap.plugin.launchnavigator --variable GOOGLE_API_KEY_FOR_ANDROID="{your_api_key}" --variable OKHTTP_VERSION=1.2.3`
+- You can find the version of the library currently specified by this plugin [in the plugin.xml](https://github.com/dpa99c/phonegap-launch-navigator/blob/master/plugin.xml)
 
 # Usage examples
 
@@ -270,6 +309,8 @@ The following table enumerates which apps support which parameters.
 | Android  | _Geo: URI scheme_              |   X  |     X     |       |            |                |  N/A |
 | Android  | Cabify                         |   X  |     X     |   X   |      X     |                |   X  |
 | Android  | Baidu Maps                     |   X  |     X<sup>[\[1\]](#apple_baidu_maps_nicknames_uri)</sup>     |   X   |      X<sup>[\[1\]](#apple_baidu_maps_nicknames_uri)</sup>     |        X       |   X  |
+| Android  | 99 Taxi                        |   X  |     X     |   X   |      X     |                |   X  |
+| Android  | Gaode Maps                     |   X  |     X     |   X   |      X     |        X       |   X  |
 | iOS      | Apple Maps - URI scheme        |   X  |           |   X   |            |        X       |   X  |
 | iOS      | Apple Maps - MapKit class      |   X  |     X     |   X   |      X     |        X       |   X  |
 | iOS      | Google Maps                    |   X  |           |   X   |            |        X       |   X  |
@@ -287,6 +328,8 @@ The following table enumerates which apps support which parameters.
 | iOS      | MAPS.ME                        |   X  |           |   X   |            |        X       |   X  |
 | iOS      | Cabify                         |   X  |     X     |   X   |      X     |                |   X  |
 | iOS      | Baidu Maps                     |   X  |     X<sup>[\[1\]](#apple_baidu_maps_nicknames_uri)</sup>     |   X   |      X<sup>[\[1\]](#apple_baidu_maps_nicknames_uri)</sup>     |        X       |   X  |
+| iOS      | 99 Taxi                        |   X  |     X     |   X   |      X     |                |   X  |
+| iOS      | Gaode Maps                     |   X  |     X     |   X   |      X     |        X       |   X  |
 | Windows  | Bing Maps                      |   X  |     X     |   X   |      X     |        X       |   X  |
 
 <a name="baidu_maps_nicknames">[1]</a>: Only supported when Start or Dest is specified as lat/lon (e.g. "50,-4")
@@ -311,11 +354,13 @@ Apps that support specifying transport mode.
 | Android  | Sygic                          |    X    |    X    |           |         |
 | Android  | MAPS.ME                        |    X    |    X    |     X     |    X    |
 | Android  | Baidu Maps                     |    X    |    X    |     X     |    X    |
+| Android  | Gaode Maps                     |    X    |    X    |     X     |    X    |
 | iOS      | Apple Maps                     |    X    |    X    |           |         |
 | iOS      | Google Maps                    |    X    |    X    |     X     |    X    |
 | iOS      | Sygic                          |    X    |    X    |           |         |
 | iOS      | MAPS.ME                        |    X    |    X    |     X     |    X    |
 | iOS      | Baidu Maps                     |    X    |    X    |     X     |    X    |
+| iOS      | Gaode Maps                     |    X    |    X    |     X     |    X    |
 | Windows  | Bing Maps                      |    X    |    X    |           |    X    |
 
 
@@ -358,6 +403,8 @@ Supported apps:
 - `launchnavigator.APP.MAPS_ME` (Android & iOS)
 - `launchnavigator.APP.CABIFY` (Android & iOS)
 - `launchnavigator.APP.BAIDU` (Android & iOS)
+- `launchnavigator.APP.TAXIS_99` (Android & iOS)
+- `launchnavigator.APP.GAODE` (Android & iOS)
 
 ### APP_NAMES
 
@@ -422,7 +469,6 @@ Either:
     Specify using `launchnavigator.TRANSPORT_MODE` constants.
     - {boolean} enableGeocoding - (Android and iOS only) if true, and input location type(s) doesn't match those required by the app, use geocoding to obtain the address/coords as required. Defaults to true.
     - {boolean} enableGeolocation - (Windows only) if false, the plugin will NOT attempt to use the geolocation plugin to determine the current device position when the start location parameter is omitted. Defaults to true. 
-    - {boolean} enableDebug - if true, debug log output will be generated by the plugin. Defaults to false.
     - {object} extras - a key/value map of extra app-specific parameters. For example, to tell Google Maps on Android to display Satellite view in "maps" launch mode: `{"t": "k"}`
         - These will be appended to the URL used to invoke the app, e.g. `google_maps://?t=k&...`
         - See [Supported app URL scheme documentation wiki page](https://github.com/dpa99c/phonegap-launch-navigator/wiki/Supported-app-URL-scheme-documentation) for links to find app-specific parameters.
@@ -469,11 +515,24 @@ Either:
                 - {string} noButtonText - text to display for the No button.
                     - Defaults to "No" if not specified.
 
+### enableDebug()
+
+Enables debug log output from the plugin to the JS and native consoles. By default debug is disabled.
+
+    launchnavigator.enableDebug(true, success, error);
+
+#### Parameters
+- {boolean} enabled - Whether to enable debug.
+- {function} success - callback to invoke on successfully setting debug.
+- {function} error - callback to invoke on error while setting debug. Will be passed a single string argument containing the error message.
+
 ### isAppAvailable()
 
 Determines if the given app is installed and available on the current device.
 
-    launchnavigator.isAppAvailable(appName, success, error);
+    launchnavigator.isAppAvailable(appName, function(isAvailable){
+        console.log(appName + " is available: " + isAvaialble);
+    }, error);
 
 #### Parameters
 - {string} appName - name of the app to check availability for. Define as a constant using `ln.APP`.
@@ -485,7 +544,11 @@ Determines if the given app is installed and available on the current device.
 
 Returns a list indicating which apps are installed and available on the current device.
 
-    launchnavigator.availableApps(success, error);
+    launchnavigator.availableApps(function(apps){
+        apps.forEach(function(app){
+            console.log(app + " is available");
+        });
+    }, error);
 
 #### Parameters
 - {function} success - callback to invoke on successful determination of availability. Will be passed a key/value object where the key is the app name and the value is a boolean indicating whether the app is available.
@@ -497,7 +560,7 @@ Returns a list indicating which apps are installed and available on the current 
 
 Returns the display name of the specified app.
 
-    launchnavigator.getAppDisplayName(app);
+    let displayName = launchnavigator.getAppDisplayName(app);
 
 #### Parameters
 - {string} app - specified as a constant in `launchnavigator.APP`. e.g. `launchnavigator.APP.GOOGLE_MAPS`. whether the app is available.
@@ -509,18 +572,18 @@ Returns the display name of the specified app.
 
 Returns list of supported apps on a given platform.
 
-    launchnavigator.getAppsForPlatform(platform);
+    let apps = launchnavigator.getAppsForPlatform(platform);
 
 #### Parameters
 - {string} platform - specified as a constant in `launchnavigator.PLATFORM`. e.g. `launchnavigator.PLATFORM.IOS`.
-- returns {string} -  {array} - apps supported on specified platform as a list of `launchnavigator.APP` constants.
+- returns {array} of {string} - apps supported on specified platform as a list of `launchnavigator.APP` constants.
 
 
 ### supportsTransportMode()
 
 Indicates if an app on a given platform supports specification of transport mode.
 
-    launchnavigator.supportsTransportMode(app, platform, launchMode);
+    let transportModeIsSupported = launchnavigator.supportsTransportMode(app, platform, launchMode);
 
 #### Parameters
 - {string} app - specified as a constant in `launchnavigator.APP`. e.g. `launchnavigator.APP.GOOGLE_MAPS`.
@@ -534,13 +597,13 @@ Indicates if an app on a given platform supports specification of transport mode
 
 Returns the list of transport modes supported by an app on a given platform.
 
-    launchnavigator.getTransportModes(app, platform, launchMode);
+    let modes = launchnavigator.getTransportModes(app, platform, launchMode);
 
 #### Parameters
 - {string} app - specified as a constant in `launchnavigator.APP`. e.g. `launchnavigator.APP.GOOGLE_MAPS`.
 - {string} platform - specified as a constant in `launchnavigator.PLATFORM`. e.g. `launchnavigator.PLATFORM.IOS`.
 - {string} launchMode (optional) - Only applies to Google Maps on Android. Specified as a constant in `launchnavigator.LAUNCH_MODE`. e.g. `launchnavigator.LAUNCH_MODE.MAPS`.
-- returns {boolean} - {array} - list of transports modes as constants in `launchnavigator.TRANSPORT_MODE`.
+- returns {array} of {string} - list of transports modes as constants in `launchnavigator.TRANSPORT_MODE`.
 If app/platform combination doesn't support specification of transport mode, the list will be empty;
 
 
@@ -549,7 +612,7 @@ If app/platform combination doesn't support specification of transport mode, the
 
 Indicates if an app on a given platform supports specification of a custom nickname for destination location.
 
-    launchnavigator.supportsDestName(app, platform, launchMode);
+    let destNameIsSupported = launchnavigator.supportsDestName(app, platform, launchMode);
 
 #### Parameters
 - {string} app - specified as a constant in `launchnavigator.APP`. e.g. `launchnavigator.APP.GOOGLE_MAPS`.
@@ -562,7 +625,7 @@ Indicates if an app on a given platform supports specification of a custom nickn
 
 Indicates if an app on a given platform supports specification of start location.
 
-    launchnavigator.supportsStart(app, platform, launchMode);
+    let startIsSupported =  launchnavigator.supportsStart(app, platform, launchMode);
 
 #### Parameters
 - {string} app - specified as a constant in `launchnavigator.APP`. e.g. `launchnavigator.APP.GOOGLE_MAPS`.
@@ -575,7 +638,7 @@ Indicates if an app on a given platform supports specification of start location
 
 Indicates if an app on a given platform supports specification of a custom nickname for start location.
 
-    launchnavigator.supportsStartName(app, platform);
+    let startNameIsSupported = launchnavigator.supportsStartName(app, platform);
 
 #### Parameters
 - {string} app - specified as a constant in `launchnavigator.APP`. e.g. `launchnavigator.APP.GOOGLE_MAPS`.
@@ -590,7 +653,7 @@ Indicates if an app on a given platform supports specification of a custom nickn
 Indicates if an app on a given platform supports specification of launch mode.
 - Currently only Google Maps on Android and Apple Maps on iOS does.
 
-    launchnavigator.supportsLaunchMode(app, platform);
+    let launchModeIsSupported = launchnavigator.supportsLaunchMode(app, platform);
 
 #### Parameters
 - {string} app - specified as a constant in `launchnavigator.APP`. e.g. `launchnavigator.APP.GOOGLE_MAPS`.
@@ -686,7 +749,7 @@ There are several example projects in the [example repo](https://github.com/dpa9
 
 ## Windows
 
-- The plugin is compatible with Windows 8.1 or Windows 10 on any PC and on Windows Phone 8.0/8.1 using the Universal .Net project generated by Cordova: `cordova platform add windows` or `cordova platform add wp8` (for windows phone 8.0)
+- The plugin is compatible with Windows 10 on any PC or Windows 10 Mobile on a phone/tablet using the Universal .Net project generated by Cordova: `cordova platform add windows`
 
 - Bing Maps requires the user to press the enter key to initiate navigation if you don't provide the start location.
 Therefore, if a start location is not going to be passed to the plugin from your app, you should install the [Geolocation plugin](https://github.com/apache/cordova-plugin-geolocation) into your project.
@@ -732,6 +795,34 @@ This plugin supports 2 different launch methods for launching the Apple Maps app
 On both Android and iOS, the "ride type" will default to "Lyft" unless otherwise specified in the `extras` list as `id`. 
 
 See the [Lyft documentation](https://developer.lyft.com/v1/docs/deeplinking) for URL scheme details and other supported ride types.
+
+## 99 Taxi
+On both Android and iOS, the extra parameters `client_id` and `deep_link_product_id` are required by 99 Taxi
+
+- `client_id` should follow the pattern `MAP_***` where `***` is the client name given by the 99 Team.
+    - If not specified defaults to `client_id=MAP_123`
+- `deep_link_product_id` identifies the ride category
+    - Currently supported values are:
+        - `316` - POP ride
+        - `326` - TOP ride
+        - `327` - Taxis ride
+    - If not specified defaults to `deep_link_product_id=316`     
+
+On Android, 99 Taxi is currently the only app where `options.start` is a **required** parameter when calling `navigate()`
+- If `navigate()` is called without a start location and the selected app is 99 Taxi, the error callback will be invoked and the 99 Taxi app will not be launched
+- In order for this plugin to automatically provide start location to 99 Taxi (if it's not already specified), the native Android implementation needs to be enhanced to:
+    - check/request runtime permission to use location
+    - add the necessary permission entries to the `AndroidManifest.xml`
+    - check/request high accuracy location is enabled (no point in requesting a low-accuracy city-level position if you want a pickup at your exact current address)
+    - request a high accuracy position to determine the user's current location
+    - handle errors cases such as:
+        - User denies location permission
+        - User denies high accuracy mode permission
+        - Location cannot be retrieved
+- Currently, I don't have time to do all of the above just for the case of 99 Taxi
+    - However I'm willing to accept a PR request which implements the necessary native Android features.
+- Otherwise/until then, you'll need to manually specify the start location for 99 Taxi
+    - If the current user location is required, you can use `cordova-plugin-geolocation` to find this.
 
 # Reporting issues
 
